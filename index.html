@@ -6,40 +6,64 @@
         var roty = 0;
         var rotz = 0;
         var speed = 1/5;
+        var accel = 0.99;
         var lastx = null;
-        var lastx = null;
+        var lasty = null;
+        var speeds = null;
+        var dontSpin = null;
         var kasen = document.getElementById("kasen");
         
         var rect = kasen.getBoundingClientRect();
         var cx = (rect.right-rect.left)/2 + rect.left
         var cy = (rect.bottom-rect.top)/2 + rect.top
         
+        function rotates(e) {
+          let dx = e.x - lastx;
+          let dy = e.y - lasty;
+          let da = (Math.atan2(e.x-cx, e.y-cy) - Math.atan2(lastx-cx,lasty-cy))* 180 / Math.PI;
+          return [dx, dy, da];
+        }
+
+        function spinher(speeds) {
+          let [dx, dy, da] = speeds;
+          rotx = rotx + dy * speed;
+          roty = roty + dx * speed;;
+          rotz = rotz + da;;
+          kasen.style.transform = "rotateX("+rotx+"deg)rotateY("+roty+"deg)rotateZ("+rotz+"deg)"
+          return [dx, dy, da];
+        }
         
         window.addEventListener("mousemove", (e) => {
           if(e.buttons>0){
             if(lastx != null){
-              let dx = e.x - lastx;
-              let dy = e.y - lasty;
-              let da = (Math.atan2(e.x-cx, e.y-cy) - Math.atan2(lastx-cx,lasty-cy))* 180 / Math.PI;
-              rotx = rotx + dy * speed;
-              roty = roty + dx * speed;;
-              rotz = rotz + da;;
-              kasen.style.transform = "rotateX("+rotx+"deg)rotateY("+roty+"deg)rotateZ("+rotz+"deg)"
-              console.log(rotx, roty);
+              speeds = rotates(e);
+              spinher(speeds);
             }
+            if (dontSpin) clearTimeout(dontSpin);
+            dontSpin = setTimeout(() => speeds = null, 50);
             lastx = e.x
             lasty = e.y
           }
           
         });
         window.addEventListener("mousedown", (e) => {
+          speeds = [0, 0, 0];
           e.preventDefault();
         });
         window.addEventListener("mouseup", (e) => {
-          lastx = null;
-          lastx = null;
+          lastx = lasty = null;
+          if (dontSpin) clearTimeout(dontSpin);
         });
-        
+
+        function loop() {
+          if (speeds) {
+            let [dx, dy, da] = speeds;
+            speeds = [dx * accel, dy * accel, da * accel];
+            spinher(speeds);
+          }
+          requestAnimationFrame(loop);
+        }
+        loop();
       </script>
   </body>
 </html>
