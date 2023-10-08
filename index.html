@@ -1,0 +1,45 @@
+<html>
+  <body>
+      <img src="kasen.png" id="kasen" style="display: block;margin: 0 auto;">
+      <script>
+        var rotx = 0;
+        var roty = 0;
+        var rotz = 0;
+        var speed = 1/5;
+        var lastx = null;
+        var lastx = null;
+        var kasen = document.getElementById("kasen");
+        
+        var rect = kasen.getBoundingClientRect();
+        var cx = (rect.right-rect.left)/2 + rect.left
+        var cy = (rect.bottom-rect.top)/2 + rect.top
+        
+        
+        window.addEventListener("mousemove", (e) => {
+          if(e.buttons>0){
+            if(lastx != null){
+              let dx = e.x - lastx;
+              let dy = e.y - lasty;
+              let da = (Math.atan2(e.x-cx, e.y-cy) - Math.atan2(lastx-cx,lasty-cy))* 180 / Math.PI;
+              rotx = rotx + dy * speed;
+              roty = roty + dx * speed;;
+              rotz = rotz + da;;
+              kasen.style.transform = "rotateX("+rotx+"deg)rotateY("+roty+"deg)rotateZ("+rotz+"deg)"
+              console.log(rotx, roty);
+            }
+            lastx = e.x
+            lasty = e.y
+          }
+          
+        });
+        window.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+        });
+        window.addEventListener("mouseup", (e) => {
+          lastx = null;
+          lastx = null;
+        });
+        
+      </script>
+  </body>
+</html>
